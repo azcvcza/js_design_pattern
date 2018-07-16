@@ -8,13 +8,17 @@
 </head>
 <body>
     <div id="div1">i 'm a div</div>
+    
 </body>
 <script>
+    //global this: window
+    //no named this : using that = this;
     window.id = "window";
     document.getElementById("div1").onclick=function(){
-        alert(this.id);
+        var that = this;
+        alert("not callback() | this.id:"+that.id);
         var callback = function(){
-            alert(this.id);
+            alert("in callbacl() | this.id:"+that.id);
         }
         callback();
     }
