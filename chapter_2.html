@@ -22,5 +22,31 @@
         }
         callback();
     }
+    //call
+    var obj1 ={
+        name:'sven',
+        getName:function(){
+            return this.name;
+        }
+    }
+    var obj2={
+        name:'anne'
+    }
+    console.log("call test1 obj1.getName()\n",obj1.getName());
+    console.log("call test1 obj2.name\n",obj2.name);
+    console.log("call test1 obj1.getName().call()\n",obj1.getName.call(obj2));
+    //change this
+    /*wrong function
+      var getid = document.getElementById
+      getid("div1");
+    */
+    document.getElementById=(function(func){
+        return function(){
+            return func.apply(document,arguments);
+        }
+    })(document.getElementById);
+    var getid = document.getElementById;
+    var div = getid("div1");
+    console.log("change the way this\n",div.id);
 </script>
 </html>
