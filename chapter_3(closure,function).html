@@ -12,6 +12,8 @@
     <div>3</div>
     <div>4</div>
     <div>5</div>
+
+    <div id="lazy">click to bind event</div>
 </body>
 <script>
     //simple closure
@@ -177,7 +179,54 @@
     },500)
     //timechunk 分时
     var timeChunk = function(arr,fnc,count){
-
+        var obj;
+        var t;
+        var len = arr.length;
+        var start = function(){
+            for(var i =0;i<Math.min(count || 1, arr.length);i++){
+                var obj = arr.shift();
+                fnc(obj);
+            }
+        }
+        return function(){
+            t = setInterval(function(){
+                if(arr.length===0){
+                    return clearInterval();
+                }
+            },200)
+        }
     }
+    var array = [];
+    for(var i =0;i<=1000;i++){
+        array.push(i);
+    }
+    var renderList = timeChunk(array,function(n){
+        var div = document.createElement('div');
+        div.innerHTML = n+6;
+        document.body.appendChild(div)
+    },8)
+
+    //LazyLoad 惰性加载
+    var addEvent = function(element,type,handler){
+        if(window.addEventListener){
+            addEvent = function(element,type,handler){
+                element.addEventListener(type,handler,false);
+            }
+        }
+        else if(window.attachEvent){
+            addEvent = function(element,type,handler){
+                element.attachEvent('on'+type,handler);
+            }
+        }
+        addEvent(element,type,handler);
+    }
+
+    var lazy = document.getElementById("lazy");
+    addEvent(lazy,'click',function(){
+        alert("lazy,1")
+    })
+    addEvent(lazy,'click',function(){
+        alert('lazy,2')
+    })
 </script>
 </html>
