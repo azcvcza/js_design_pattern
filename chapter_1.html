@@ -52,9 +52,9 @@
         return typeof ret === 'Object' ? ret:obj;
     }
     var aPerson = objectFactory(Person,'sven');
-    console.log(a.name);
-    console.log(a.getName);
-    console.log(Object.getPrototypeOf(a)===Person.prototype);
+    console.log(aPerson.name);
+    console.log(aPerson.getName);
+    console.log(Object.getPrototypeOf(aPerson)===Person.prototype);
 
     //ECMA6 
     class Animal{
@@ -76,8 +76,70 @@
         }
     }
     var dog = new Dog('scramp');
-    console.log(dog.getName+' says '+dog.speak);
+    console.log(dog.getName()+' says '+dog.speak());
+    
+    //mixin
+    function mixin(source,target){
+        for(var key in source){
+            if(!(key in target)){
+                target[key] = source[key];
+            }
+        }
+        return target;
+    }
+    var vehicle = {
+        engines :1,
+        ignition:function(){
+            console.log("engine on");
+        },
+        drive:function(){
+            this.ignition();
+            console.log(" drving ")
+        }
 
+    }
+
+    var car  = mixin(vehicle,{
+        wheels:4,
+        drive:function(){
+            vehicle.drive.call(this);
+            console.log("car drving")
+        }
+    })
+    vehicle.drive()
+    car.drive()
+    //prototype building 
+
+    function vehicle_proto(){
+        this.engines =1;
+    }
+    vehicle_proto.prototype.ignition =function(){
+        console.log("inig in proto");
+    }
+    vehicle_proto.prototype.drive = function(){
+        this.ignition();
+        console.log("drive in proto")
+    }
+
+    function car_proto(){
+        var car_proto_obj = new vehicle_proto;
+        car.wheels = 4;
+        var vehDrive = car.drive;
+        car.drive = function(){
+            vehDrive.call(this);
+            console.log("drive in car proto");
+        }
+        return car_proto_obj;
+    }
+    var mycar = new car_proto();
+    mycar.drive();
+
+    //object create
+    var anotherObject = {
+        a:2;
+    }
+    var myObject = Object.create(anotherObject);
+    console.log(anotherObject.a,myObject.a)
 </script>
 
 </html>
