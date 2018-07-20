@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>JS单例模式</title>
+</head>
+<body>
+    <button id="loginbutton">登录</button>
+    <div id="div1"></div>
+</body>
+<script>
+    //simple singlarity
+    //using namespace
+    var MyApp = {}
+    MyApp.namespace = function(name){
+        var parts = name.split('.');
+        var current = MyApp;
+        for(var i in parts){
+            if(!current[parts[i]]){
+                current[parts[i]] = {}
+            }
+            else{
+                current = current[parts[i]]
+            }
+        }
+    }
+    MyApp.namespace('event');
+    MyApp.namespace('dom.style');
+    console.dir(MyApp)
+    console.log(MyApp)
+
+    //closure
+    var user  = (function(){
+        var _name = 'sven';
+        var _age = 20;
+        return {
+            getUserInfo:function(){
+                return _name+":"+_age;
+            }
+        }
+    })
+    var man = user();
+    console.log(man.getUserInfo())
+    //lazy create when needed
+
+    var getSingle = function(fn){
+        var result ;
+        console.log("type:",fn)
+        return function(){
+            return result || (result =fn.apply(this,arguments));
+        }
+    }
+    var createIframe = function(){
+        var iframe = document.createElement('iframe');
+        //iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        return iframe;
+    }
+    var createLoginLayer = function(){
+        var div = document.createElement('div');
+        div.innerHTML = 'i\'m  a window';
+        div.style.display = 'none';
+        document.body.appendChild(div);
+        return div;
+    }
+    var create_single_LoginLayer = getSingle(createLoginLayer);
+    var create_single_Iframe = getSingle(create_single_Iframe);
+    document.getElementById("loginbutton").onclick = function(){
+       
+        var loginLayer = create_single_LoginLayer();
+        loginLayer.style.display='block'
+    }
+    document.getElementById("loginbutton").onclick = function(){
+       
+        var iframe = create_single_Iframe();
+        //iframe.style.display = 'block';
+    }
+
+    //apply on event 
+    var bindEvent = getSingle(function(){
+        document.getElementById('div1').onclick = function(){
+            alert("click");
+        }
+        return true;
+
+    })
+    var render = function(){
+        console.log("render start");
+        bindEvent();
+    }
+    render();
+    render();
+
+</script>
+</html>
