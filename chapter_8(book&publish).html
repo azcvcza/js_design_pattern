@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>发布-订阅模式</title>
+</head>
+<body>
+    
+</body>
+<script>
+    //simple strategy
+    var salesOffices = {};
+    salesOffices.clientList = {};
+    salesOffices.listen=function(key,fn){
+        if(!this.clientList[key]){
+            this.clientList[key] = [];
+        }
+        
+        this.clientList[key].push(fn);
+    }
+    salesOffices.trigger = function(){
+        var key = Array.prototype.shift.call(arguments);
+        var fns = this.clientList[key];
+        if(!fns || fns.length===0){
+            return false;
+
+        }
+        for(var i=0,fn;fn=fns[i++];){
+            fn.apply(this,arguments)
+        }
+        
+    }
+    salesOffices.listen("sM88",function(price){
+        //console.log("first call");
+        console.log("price:",price);
+    })
+    salesOffices.listen("sM110",function(price){
+        //console.log("second call");
+        console.log("price:",price);
+    })
+    salesOffices.trigger('sM88',200000);
+    salesOffices.trigger('sM110',300000);
+
+    //modification 
+    var event = {
+        clientList:[],
+        listen:function(key,fn){
+            if(!this.clientList[key]){
+                this.clientList[key] = [];
+            }
+            this.clientList[key].push(fn);
+        },
+        trigger:function(){
+            var key = Array.prototype.shift.call(arguments);
+            var fns = this.clientList[key];
+            if(!fns||fns.length===0){
+                return false;
+            }
+            for(var i=0,fn;fn=fns[i++];){
+                fn.apply(this,arguments);
+            }
+        }
+    }
+    event.remove = function(key,fn){
+        
+        var fns = this.clientList[key];
+        if(!fns){
+            return false;
+        }
+        if(!fn){
+            fns && (fns.length==0);
+        }
+        else{
+            for(var l=fns.length;l>=0;l--){
+                var _fn = fns[l];
+                if(_fn===fn){
+                    fns.splice(l,1);
+                }
+            }
+        }
+    }
+    var installEvent = function(obj){
+        for(var i in event){
+            obj[i] = event[i];
+        }
+    }
+    var salesOffices= {};
+    installEvent(salesOffices);
+    salesOffices.listen("sm88",fn1=function(price){
+        console.log("new listen,price:"+price);
+    })
+    salesOffices.listen("sm110",fn2=function(price){
+        console.log("new listen,price:"+price);
+    })
+
+    salesOffices.trigger("sm88",200);
+    salesOffices.trigger("sm110",100);
+    salesOffices.remove("sm88",fn1);
+    salesOffices.trigger("sm88",400);
+
+    
+
+</script>
+</html>
