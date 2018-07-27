@@ -7,9 +7,23 @@
     <title>命令模式</title>
 </head>
 <body>
-    <button id="button1">click button1</button>
-    <button id="button2">click button2</button>
-    <button id="button3">click button3</button>
+    <div class="command">
+            <button id="button1">click button1</button>
+            <button id="button2">click button2</button>
+            <button id="button3">click button3</button>
+    </div>
+    <div class="undo">
+        <div id="ball" style="position:absolute;background:#000;width:50px;height:50px"></div>
+        
+       
+    </div>
+    <hr>
+    <hr>
+    <hr>
+    <p>input position</p>
+    <input type="text" id="pos">
+    <button id="moveBtn">start move</button>
+    <button id="cancelBtn">undo</button>
 </body>
 <script>
     //simple command in js
@@ -29,8 +43,62 @@
             console.log("del sub menu");
         }
     }
-    bindclick(button1,MenuBar.refresh);
+    //bindclick(button1,MenuBar.refresh);
     bindclick(button2,SubMenu.add);
     bindclick(button3,SubMenu.del);
+    //further more
+    var setCommand = function(button,command){
+        button.onclick=function(){
+            command.execute();
+        }
+    }
+    var MenuBar_1 = {
+        refresh:function(){
+            console.log("refresh menu 1");
+        }
+    }
+    var RefreshMenuBarCommand = function(reciver){
+        return {
+            execute:function(){
+                reciver.refresh();
+            }
+        }
+    }
+    var r_menubar_command = RefreshMenuBarCommand(MenuBar_1);
+    setCommand(button1,r_menubar_command)
+
+    //undo demo
+    var ball = document.getElementById("ball");
+    var pos = document.getElementById("pos");
+    var moveBtn = document.getElementById("moveBtn");
+    var cancelBtn = document.getElementById("cancelBtn");
+
+    var MoveCommand = function(reciver,pos){
+        this.reciver - reciver;
+        this.pos = pos;
+        this.oldPos = null
+
+    }
+    MoveCommand.prototype.execute = function(){
+        this.receiver.start('right',this.pos,1000,'strongEaseOut');
+        this.oldPos = this.receiver.dom.getBoundingClientRect()[this.receiver.propertyName];
+    }
+    MoveCommand.prototype.undo = function(){
+        this.receiver.start('left',this.pos,1000,'strongEaseOut');
+
+    }
+    var move_command;
+
+    moveBtn.onclick = function(){
+        var animate = new Animate( ball );//Animate() not defined;
+        move_command = new MoveComand(animate,pos.value);
+        move_command.execute();
+    }
+    cancelBtn.onclick = function(){
+        moveCommand.undo();
+    }
+
+
+    
 </script>
 </html>
