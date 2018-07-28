@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>装饰者模式</title>
+</head>
+
+<body>
+    <button tag="login" id="button">click to open login layer</button>
+</body>
+<script>
+    //simple decorator
+    var plane = function () {};
+    plane.prototype.fire = function () {
+        console.log("common fire");
+
+    }
+    var missile_decorator = function (plane) {
+
+        this.plane = plane;
+    }
+    missile_decorator.prototype.fire = function () {
+        this.plane.fire();
+        console.log("missile launch");
+
+    }
+
+    var atom_decorator = function (plane) {
+        this.plane = plane;
+    }
+    atom_decorator.prototype.fire = function () {
+        this.plane.fire();
+        console.log("nuclear boob");
+    }
+    var plane_a = new plane();
+    plane_a = new missile_decorator(plane_a);
+    plane_a = new atom_decorator(plane_a);
+    plane_a.fire()
+    //further more
+    //AOP
+    Function.prototype.before = function(beforefnc){
+        var _self = this;//save this;
+        return function(){
+            beforefnc.apply(this,arguments);//call decorator function;
+            return _self.apply(this,arguments);//call origin function;
+        }
+    }
+    Function.prototype.after = function(afterfnc){
+        var _self = this;//save this,sometimes it maybe function,
+                         //some times it is window;
+        return function(){
+            var ret = _self.apply(this,arguments);//call origin function;
+            afterfnc.apply(this,arguments);
+            return ret;
+        }
+    }
+    //defensive program
+    var before_def = function(originfunc,beforefunc){
+        return function(){
+            beforefunc.apply(this,arguments);
+            return originfunc.apply(this,arguments);
+        }
+    }
+    var b = before_def(
+        function(){console.log("hello ")},
+        function(){console.log("world")} 
+    );
+    console.log(b)
+    b =before_def(b,function(){console.log("origin")});
+    b();
+    //statistcs module
+
+    var log = function(tag){
+        console.log("upload tag is:"+this.getAttribute('tag'));
+
+    }
+    var showLogin = function(){
+        console.log("open upload layer");
+    }
+    showLogin = showLogin.after(log);
+    document.getElementById('button').onclick = showLogin;
+    //AOP change parameter
+    var console_param=function(param){
+        console.log(param);
+    }
+    console_param = console_param.before(function(param){
+        param.b = 'b';
+    })
+    console_param({a:'a'});
+    //AOP change parameter further more
+    var a_jax = function(type,url,param){
+        console.dir(param);
+    }
+    
+
+    var gettoken = function(){
+        return 'Token';
+    }
+    //add a token to param without,add code into a_jax();
+    a_jax = a_jax.before(
+        function(type,url,param){
+            param.Token = gettoken();
+        }
+    )
+    a_jax('get','http://fuck.you',{name:'hello'});
+</script>
+
+</html>
