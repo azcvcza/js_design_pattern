@@ -37,6 +37,37 @@
     }
     var light_1 = new raw_light();
     light_1.init();
-    //state 
+    //js state machine
+    var js_light = function(){
+        this.currState = FSM.off;
+        this.button = null;
+    } 
+    js_light.prototype.init = function(){
+        var button = document.createElement('button');
+        var self = this;
+        button.innerHTML("second button off");
+        this.button = document.body.appendChild(button);
+        this.button.onclick = function(){
+            self.currState.buttonWasPressed.call(self);
+        }
+    }
+    var FSM = {
+        off:{
+            buttonWasPressed:function(){
+                console.log("js_light off");
+                this.button.innerHTML = "next click to be on";
+            }
+
+        },
+        on:{
+            buttonWasPressed:function(){
+                console.log("js_light on");
+                this.button.innerHTML="next click to be off";
+                this.currState = FSM.off;
+            }
+        }
+    }
+    var js_light_1 = new js_light();
+    js_light_1.init();
 </script>
 </html>
